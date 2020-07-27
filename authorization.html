@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="http://localhost:3000/">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+    </head>
+    
+    <body>
+        <h1 class="text-shadow-2">Welcome to the chat</h1>
+        <form id="loginform" class="unauthorized">
+            <input id="login" placeholder="Enter your username"><br>
+            <input id="password" placeholder="Enter your password">
+        </form>
+        <output id="messages"></output>
+        <button onclick="signIn()", class="knopka">Sign in</button>
+        <button onclick="registration()", class="knopka">Registration</button>
+        
+    </body>
+    <style>
+       h1.text-shadow-2 {
+    height: 150px;
+    font-size: 50px;
+    text-align: center;
+}
+        .text-shadow-2 {
+  background: linear-gradient(-45deg, #FEE864, #F5965E);
+  color: #f4f4f4;
+  text-shadow: -1px -1px white, 1px 1px gray, 2px 2px #7a7a7a, 3px 3px #757575, 4px 4px #707070, 5px 5px #6b6b6b, 6px 6px #666666, 7px 7px #616161, 8px 8px #5c5c5c, 9px 9px #575757, 10px 10px #525252, 11px 11px #4d4d4d, 18px 18px 30px rgba(0, 0, 0, .4), 18px 18px 10px rgba(0, 0, 0, .4);
+}
+    </style>
+    <script>
+       var ws = new WebSocket('ws://localhost:3000/authorization');
+       //var log = document.getElementById('log');
+       
+       ws.onopen = (function(event){
+           
+           console.log('connected to ws server');
+
+           ws.onmessage = ((event) =>{
+                console.log(event);
+                if(event.data == '0'){
+                    window.location.href = 'file:///C:/Users/Mr.Black/chat/registration.html';
+                }if(event.data == '1'){
+                    window.location.href = 'file:///C:/Users/Mr.Black/chat/index.html';
+                }
+           });
+       });
+
+       const signIn = () =>{
+         
+            var login = document.getElementById('login');
+
+            var password = document.getElementById('password');
+
+           ws.send(JSON.stringify({
+                login: login.value,
+                password: password.value
+           }));console.log('login is: ' +login.value+' '+'password is: ' +password.value);
+       }
+       const registration = () =>{
+        window.location.href = 'file:///C:/Users/Mr.Black/chat/registration.html';
+       }
+        </script>
+</html>

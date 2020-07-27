@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>WebSockets</title>
+        <link rel="stylesheet" href="index.css">
+        
+    </head>
+    <body>
+        <div id="log"></div>
+        <div id="User"></div>
+
+        <div id="sendCtrls">
+
+            <input type="text" placeholder="Your message here" id="text">
+            
+            <button onclick="sendMessage()", class="knopka">Send Msg</button>
+
+        </div>
+        
+
+        <script>
+            var ws = new WebSocket('ws://localhost:3000/echo');  
+
+        ws.onopen = function(event){
+            console.log('connected to the ws server');
+        if(ws.onopen){ 
+            log.innerHTML += "You: has been connected to the server!"+"<br>";
+    } 
+}
+var log = document.getElementById('log');
+
+    ws.onmessage = function(event){
+        console.log(event);  
+           // event =  JSON.parse(event.data);
+                log.innerHTML +=": "+event.data+"<br>";
+                        
+}
+    
+    document.querySelector('button').onclick = function(){
+
+        var text = document.getElementById('text').value;
+            ws.send(JSON.stringify({
+                type:"message",
+                data: text
+            }));
+                if (document.getElementById('text').value == '')
+                { 
+                    alert("Enter your message");
+                }else{ 
+                    log.innerHTML +="You: "+text+"<br>";
+                    document.getElementById('text').value ="";
+                    }
+}
+    document.addEventListener("keydown", check, false);
+
+        function check (Key){
+            if (event.keyCode == "13"){
+                var text = document.getElementById('text').value;
+                    ws.send(JSON.stringify({
+                        type:"message",
+                        data: text
+                    }));
+                if (document.getElementById('text').value == '')
+                { 
+                    alert("Enter your message");
+                }else{ 
+                    log.innerHTML +="You: "+text+"<br>";
+                    document.getElementById('text').value ="";
+                     }
+            }
+                    
+        }
+             </script>
+    </body>
+   
+</html>
