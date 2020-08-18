@@ -8,6 +8,9 @@ const mongo = require('mongodb').MongoClient;
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const boduParser = require('body-parser');
+const { MongoClient, ObjectID } = require('mongodb');
+const md5 = require('md5');
+const crypto = require('crypto');
 let connects = [];
 
 
@@ -15,14 +18,33 @@ app.use(cors());
 app.use(boduParser.json());
 app.use(boduParser.urlencoded({extended: true}));
 app.use(cookieParser());
-app.use(session({secret: "My secret"}));
+app.use(express.static(__dirname + '/chat'));
+
+var genRandomString = function(length){
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex') /** convert to hexadecimal format */
+            .slice(0,length);   /** return required number of characters */
+};
+
+var sha512 = function(password, salt){
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+        salt:salt,
+        passwordHash:value
+    };
+};
+
 
 
 mongo.connect('mongodb://localhost:27017/', {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) =>{
 
     const db = client.db('usersdb');
-    const collection = db.createCollection('users');
-    app.locals.collection = client.db('usersdb').collection('users');
+    const users = db.createCollection('users');
+    const messages = db.createCollection('messages');
+    app.locals.users = client.db('usersdb').collection('users');
+    app.locals.messages = client.db('usersdb').collection('messages');
 
     if(err){
         console.log('Connection error: ' , err);
@@ -32,148 +54,140 @@ mongo.connect('mongodb://localhost:27017/', {useNewUrlParser: true, useUnifiedTo
 
 });
 
-app.get('/authorization', function(req, res){
+
+app.get('/', function(req, res){
     console.log('Client has been connected to the server and waiting authorizzation');
-    res.send('hello from the server');
-    
+    const session = req.cookies['session'] || false;
+    const users = app.locals.users
+    if(session){
+        users.findOne({session: session}, function(err,result){
+            if(result)
+            {
+                res.sendFile('aplication.html',{root: __dirname + '/chat'});
+            }else{
+                res.redirect('authorization.html');
+            }
+        });  
+    }else{
+        res.redirect('authorization.html');
+    }
 });
 
 app.post('/authorization', function(req, res){
     console.log(req.body);
-    const collection = req.app.locals.collection;
-    collection.findOne((req.body), function(err, result){
-        if(err){ 
-             return(console.log(err));
-        }if(result == null){
-            console.log('crete one');
-            res.sendStatus(400);
-        }else{
-            console.log(result);
-            res.sendStatus(200);
+    const users = req.app.locals.users;
+    var salt;
+    var passwordData;
+    users.findOne({login: req.body.login}, function(err, result){
+        if(result.password === req.body.password){
+            function saltHashPassword(userpassword) {
+                 salt = genRandomString(16); /** Gives us salt of length 16 */
+                 passwordData = sha512(userpassword, salt);
+                console.log('UserPassword = '+userpassword);
+                console.log('Passwordhash = '+passwordData.passwordHash);
+                console.log('nSalt = '+passwordData.salt);
+            };            
+            saltHashPassword(JSON.stringify(result.password));
+            const session = passwordData.passwordHash;
+            res.cookie('session', session);
+            users.updateOne({"_id": ObjectID(result._id)}, {$set: {session: session}});
+            res.append('X-Redirect', 'aplication.html');
+            res.send('');
         }
     });
 });
 
 app.post('/registration', function(req, res){
-    res.cookie(req.body);
     console.log(req.body);
-    const collection = req.app.locals.collection;
-    collection.findOne((req.body), function(err, result){
+    const users = req.app.locals.users;
+    users.findOne({login: req.body.login}, function(err, result){
         if(err){ 
              return(console.log(err));
-        }if(result == null){
-            console.log('crete one');
-            collection.insert(req.body, function(err, result){
-                if (err)
-                    return(console.log(err));
-            });
-            res.sendStatus(200);
-            //res.redirect('/authorization');
+        }if(result != null){
+            res.send('try another login');
         }else{
-            console.log(result);
-            res.sendStatus(400);
+            users.findOne({login: req.body.name}, function(err, result){
+                if(err){ 
+                    return(console.log(err));
+               }if(result != null){
+                res.send('try another name');
+               }else{
+                users.insertOne({login: req.body.login, name: req.body.name, password: req.body.password}, function(err, result){
+                    if (err) return(console.log(err));
+                        res.append('X-Redirect', 'authorization.html');
+                        res.send('');
+                });
+               }
+            });
         }
     });
 });
 
-
-
-/*app.ws('/echo', function(websocket,req){
-    console.log('A new client con!');
-    connects.push(websocket);
-            websocket.on('message',function(msg){
-                msg = JSON.parse(msg);
-                message = msg.data;
-                let name = data.name;
-                console.log(message);
-                const collection = req.app.locals.collection;
-                collection.findOne(({name: name}), function(err, result){
-                    if(err){
-                        return(console.log(err));
-                    }else{
-                        console.log(result);
-                    }
-                });
-                
-                //var clients = req;
-                connects.forEach(function e(client){
-                    if(client != websocket){ 
-                        client.send(message, name);
-                        client.send(JSON.stringify({
-                           // name: ws.personName,
-                            message: message
-                         }));
+app.ws('/echo', function(websocket,req){
+    const session = req.cookies['session'] || false;
+    const users = app.locals.users
+    const messages = req.app.locals.messages;
+    if(session){
+       messages.find().sort({$natural: -1}).limit(10).toArray(function(err,result){
+           var history = result.reverse();
+           websocket.send(JSON.stringify({type:'history', history: result}));
+        console.log(history);
+       });
+        users.findOne({session: session}, function(err,result){
+            if(result)
+            {
+                websocket.send(JSON.stringify({name: result.name, type: 'userInfo'}));
+                console.log('A new client con!');
+                websocket.name = result.name;
+        connects.push(websocket);
+                websocket.on('message',function(msg){
+                    msg = JSON.parse(msg);
+                    let message = msg.data;
+                    console.log(websocket.name+': '+ message);
+                    connects.forEach(function e(client){
+                        if(client.readyState === websocket.OPEN){
+                            if(client != websocket){ 
+                                if(msg.type === 'message'){
+                                client.send(JSON.stringify({
+                                    name: websocket.name,
+                                    message: message,
+                                 }));
+                                }else{ client.send(JSON.stringify(msg))}
+                            } 
                         }
-                        
-            });
-            collection.insert({name: name, message: message}, function(err, result){
-                if(err){
-                    return(console.log(err));
-                }
-            });
+                    });
+                    messages.insert({name: websocket.name, message: message}, function(err, result){
+                        if(err){
+                            return(console.log(err));
+                        }
+                    });
     
+                });
+        }else{
+                websocket.terminate();
+            }
+        });  
+    }else{
+        websocket.terminate();
+    }
+    websocket.on('error', function(err){
+        console.log(err);
     });
-});*/
 
+    websocket.on('close', function(err){
+        console.log('ups i lost a client');
+    });
+});
+
+
+app.get('/logout', function(req, res){
+    const session = req.cookies['session'] || false;
+    res.clearCookie('session');
+        res.redirect('authorization.html');
+   
+});
 
 
 
 app.listen(portNumber, ()=> {console.log('Server is running on port:3000')});
 
-/*app.ws('/authorization', function(websocket, req){
-    console.log('Client has been connected to the server and waiting authorizzation');
-        websocket.on('message', function(data){
-            data = JSON.parse(data);
-            let login = data.login;
-            let password = data.password;
-            console.log('user login is: ' +login);
-            console.log('user password is: '+ password);
-            const collection = req.app.locals.collection;
-            collection.findOne(({login: login, password: password}), function(err, result){
-                if(err){ 
-                     return(console.log(err));
-                }if(result == null){
-                    websocket.send(JSON.stringify(0));
-                }else{
-                    console.log(result);
-                    websocket.send(JSON.stringify(1));
-                }
- 
-            });
-        }); 
-});*/
-
-/*app.ws('/registration', function(websocket, req){
-    console.log('Client has been connected to the server and waiting registration');
-        websocket.on('message', function(data){
-                data = JSON.parse(data);
-                let login = data.login;
-                let password = data.password;
-               // let name =data.name;
-                console.log('user login is: ' +login);
-                console.log('user password is: '+ password);
-                //console.log('user name is: '+ name);
-                const collection = req.app.locals.collection;
-                const user = [{login: login, password: password}];
-                collection.findOne(({login: login, password: password}), function(err, result){
-                    if(err){ 
-                         return(console.log(err));
-                    }if(result == null){
-                        collection.insert(user, function(err, result){
-                            if (err)
-                                return(console.log(err));
-                                websocket.send(user);
-                            
-                        });
-                        websocket.send(1);
-                        
-
-                    }else{
-                        console.log(result);
-                        websocket.send('try another login')
-                    }
-     
-                });
-
-            }); 
-    });*/
