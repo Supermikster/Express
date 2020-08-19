@@ -1,5 +1,5 @@
 var log = document.getElementById('log');
-document.getElementById('signIn').addEventListener("click", function(e){
+document.getElementById('signIn').addEventListener("click", function(e) {
     e.preventDefault();
     let autoriz = document.forms["loginform"];
     let login = document.getElementById('login');
@@ -10,17 +10,18 @@ document.getElementById('signIn').addEventListener("click", function(e){
     request.setRequestHeader("Content-Type", "application/json");
     request.addEventListener("load", function (e) { 
         var url = request && request.getResponseHeader('X-Redirect');
-        if(url){
+        if(url) {
             window.location.assign(url);
-        }else{
+        } else {
             log.innerHTML = request.response;
             return;
         }
     });
 
     request.send(JSON.stringify({login: login.value, password: password.value}));
-    });
-    document.getElementById('registration').addEventListener("click", function(e){
+});
+
+document.getElementById('registration').addEventListener("click", function(e) {
     e.preventDefault();
     window.location.href='registration.html';
-    });
+});
