@@ -79,7 +79,10 @@ app.post('/authorization', function(req, res){
     var salt;
     var passwordData;
     users.findOne({login: req.body.login}, function(err, result){
-        if(result.password === req.body.password){
+        if(result == null){
+            res.send('Wrong login');
+            return;
+        }else if(result.password === req.body.password){
             function saltHashPassword(userpassword) {
                  salt = genRandomString(16); /** Gives us salt of length 16 */
                  passwordData = sha512(userpassword, salt);
@@ -93,6 +96,9 @@ app.post('/authorization', function(req, res){
             users.updateOne({"_id": ObjectID(result._id)}, {$set: {session: session}});
             res.append('X-Redirect', 'aplication.html');
             res.send('');
+        }else{
+            res.send('Wrong login or password');
+            return;
         }
     });
 });
@@ -104,13 +110,24 @@ app.post('/registration', function(req, res){
         if(err){ 
              return(console.log(err));
         }if(result != null){
-            res.send('try another login');
+            res.send('Try another login');
+            return;
+        }if(req.body.login.length < 8){
+            res.send('Login is too short');
+            return;
         }else{
             users.findOne({login: req.body.name}, function(err, result){
                 if(err){ 
                     return(console.log(err));
                }if(result != null){
-                res.send('try another name');
+                res.send('Try another name');
+                return;
+               }if(req.body.name.length < 4){
+                    res.send('Name is too short');
+                    return;
+               }if(req.body.password.length < 10){
+                    res.send('Password is too short');
+                    return;
                }else{
                 users.insertOne({login: req.body.login, name: req.body.name, password: req.body.password}, function(err, result){
                     if (err) return(console.log(err));

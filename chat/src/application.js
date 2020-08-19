@@ -12,7 +12,7 @@ var ws = new WebSocket('ws://localhost:3000/echo?session='+session);
 ws.onopen = function(event){
     console.log('connected to the ws server');
         if(ws.onopen){ 
-            log.innerHTML += "You: has been connected to the server!"+"<br>";
+            log.innerHTML += "You: have been connected to the chat!"+"<br>";
         } 
     checkStatus();
 }
@@ -121,8 +121,6 @@ for(i = 0; i <= my_emoji.length -1; i++){
     console.log(my_emoji[i]);
     my_emoji[i].addEventListener('click', (event)=>{
         emoji_clicked = event.target.textContent;
-        //console.log(emoji_clicked);
-      // console.log(  JSON.stringify(emoji_clicked));
         ws.send(JSON.stringify({ 
             type: 'emoji',
             data: emoji_clicked

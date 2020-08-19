@@ -1,4 +1,4 @@
-
+var log = document.getElementById('log');
 document.getElementById('signIn').addEventListener("click", function(e){
     e.preventDefault();
     let autoriz = document.forms["loginform"];
@@ -14,6 +14,9 @@ document.getElementById('signIn').addEventListener("click", function(e){
         var url = request && request.getResponseHeader('X-Redirect');
         if(url){
             window.location.assign(url);
+        }else{
+            log.innerHTML = request.response;
+            return;
         }
     });
 

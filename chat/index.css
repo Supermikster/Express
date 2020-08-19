@@ -7,8 +7,7 @@ body {
 button.ghostbutton  {
     display: block;
     box-sizing: border-box;
-    margin-left: 135 px;
-    margin-left: 167px;
+    margin-left: 81px;
     padding: 8px;
     width: 150px;
     max-width: 200px;
@@ -45,7 +44,14 @@ div#log {
 
 div#sendCtrls {
     width: 180px;
-    margin: 0 auto;
+}
+
+button#sendMsg {
+    margin-left: 558px;
+}
+
+input#text {
+    margin-left: 526px;
 }
 
 button.knopka {
@@ -62,28 +68,12 @@ button.knopka:hover {
 	background: #FF6347; 
 }
 
-
-h1.text-shadow-2 {
-    height: 150px;
-    font-size: 50px;
-    text-align: center;
-}
-        .text-shadow-2 {
-  color: #f4f4f4;
-  text-shadow: -1px -1px white, 1px 1px gray, 2px 2px #7a7a7a, 3px 3px #757575, 4px 4px #707070, 5px 5px #6b6b6b, 6px 6px #666666, 7px 7px #616161, 8px 8px #5c5c5c, 9px 9px #575757, 10px 10px #525252, 11px 11px #4d4d4d, 18px 18px 30px rgba(0, 0, 0, .4), 18px 18px 10px rgba(0, 0, 0, .4);
-}
-
-input[id=login]{
-    width: 270px;
-    padding: 10px;
-    margin-left: 533px;
-}
-input[id=password]{
+input[id=text]{
     width: 270px;
     padding: 10px;
     margin-left: 533px;
 }
 
-button#signIn {
-    margin-left: 451px;
+div#emoji {
+    display: inline-block;
 }
