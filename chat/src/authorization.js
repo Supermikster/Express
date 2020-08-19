@@ -4,8 +4,6 @@ document.getElementById('signIn').addEventListener("click", function(e){
     let autoriz = document.forms["loginform"];
     let login = document.getElementById('login');
     let password = document.getElementById('password');
-    //login = JSON.stringify({login: login});
-    //password = JSON.stringify({password: password});
     let user = JSON.stringify({login: login.value, password: password.value});
     let request = new XMLHttpRequest();
     request.open("POST","http://localhost:3000/authorization", true);
@@ -22,13 +20,7 @@ document.getElementById('signIn').addEventListener("click", function(e){
 
     request.send(JSON.stringify({login: login.value, password: password.value}));
     });
-//});
     document.getElementById('registration').addEventListener("click", function(e){
     e.preventDefault();
     window.location.href='registration.html';
     });
-
-    //let request = new XMLHttpRequest();
-   //request.open("GET","http://localhost:3000/authorization", true);
-    //request.onload = () => {}
-    //request.send();

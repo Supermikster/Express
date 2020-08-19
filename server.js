@@ -156,7 +156,7 @@ app.ws('/echo', function(websocket,req){
                 websocket.send(JSON.stringify({name: result.name, type: 'userInfo'}));
                 console.log('A new client con!');
                 websocket.name = result.name;
-        connects.push(websocket);
+                connects.push(websocket);
                 websocket.on('message',function(msg){
                     msg = JSON.parse(msg);
                     let message = msg.data;
@@ -173,7 +173,7 @@ app.ws('/echo', function(websocket,req){
                             } 
                         }
                     });
-                    messages.insert({name: websocket.name, message: message}, function(err, result){
+                    messages.insertOne({name: websocket.name, message: message}, function(err, result){
                         if(err){
                             return(console.log(err));
                         }
