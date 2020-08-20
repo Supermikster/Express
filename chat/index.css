@@ -2,7 +2,7 @@ body {
     background-image: url(back.png);               
 }
 
-button.ghostbutton  {
+button.ghostbutton {
     display: block;
     box-sizing: border-box;
     margin-left: 81px;

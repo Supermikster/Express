@@ -25,7 +25,7 @@ ws.onopen = function(event) {
 }
 
 ws.onmessage = function(event) {
-    var data =  JSON.parse(event.data);
+    var data = JSON.parse(event.data);
     var type = data.type; 
         switch (type) {
             case 'userInfo':
@@ -70,28 +70,27 @@ document.getElementById('sendMsg').addEventListener("click", function(e) {
             emoji: emoji_clicked
         }));
         if (document.getElementById('text').value == '') { 
-            alert("Enter your message");
+            alert('Enter your message');
         } else { 
-            log.innerHTML +="You: " + text + "<br>";
-            document.getElementById('text').value ="";
+            log.innerHTML += "You: " + text + "<br>";
+            document.getElementById('text').value = '';
         }
     checkStatus();
 });
 
 document.addEventListener("keydown", check, false);
-function check (Key) {
+function check (key) {
     if (event.keyCode == "13") {
         var text = document.getElementById('text').value;
             ws.send(JSON.stringify({
                 type: "message",
                 data: text,
-
             }));
         if (document.getElementById('text').value == '') { 
-            alert("Enter your message");
+            alert('Enter your message');
         } else { 
-            log.innerHTML +="You: " + text + "<br>";
-            document.getElementById('text').value ="";
+            log.innerHTML += "You: " + text + "<br>";
+            document.getElementById('text').value = '';
         }
         checkStatus();
     }            
@@ -99,7 +98,7 @@ function check (Key) {
 
 document.getElementById('logOut').addEventListener("click", function(e) {
     e.preventDefault();
-    window.location.href='http://localhost:3000/logout';
+    window.location.href = 'http://localhost:3000/logout';
 });
 
 div = document.getElementById('emoji');
@@ -129,6 +128,3 @@ for (i = 0; i <= my_emoji.length -1; i++) {
         }));
     });
 }
-
-
-   

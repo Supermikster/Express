@@ -19,19 +19,19 @@ app.use(boduParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(__dirname + '/chat'));
 
-var genRandomString = function(length) {
+let genRandomString = function(length) {
     return crypto.randomBytes(Math.ceil(length / 2))
-            .toString('hex') /** convert to hexadecimal format */
-            .slice(0, length);   /** return required number of characters */
+        .toString('hex') /** convert to hexadecimal format */
+        .slice(0, length);   /** return required number of characters */
 };
 
-var sha512 = function(password, salt) {
-    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+let sha512 = function(password, salt) {
+    let hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
     hash.update(password);
-    var value = hash.digest('hex');
+    let value = hash.digest('hex');
     return {
-        salt:salt,
-        passwordHash:value
+        salt: salt,
+        passwordHash: value
     };
 };
 
@@ -53,7 +53,7 @@ app.get('/', function(req, res) {
     const session = req.cookies['session'] || false;
     const users = app.locals.users
     if (session) {
-        users.findOne({session: session}, function(err,result) {
+        users.findOne({session: session}, function(err, result) {
             if (result) {
                 res.sendFile('aplication.html', {root: __dirname + '/chat'});
             } else {
@@ -68,8 +68,8 @@ app.get('/', function(req, res) {
 app.post('/authorization', function(req, res) {
     console.log(req.body);
     const users = req.app.locals.users;
-    var salt;
-    var passwordData;
+    let salt;
+    let passwordData;
     users.findOne({login: req.body.login}, function(err, result) {
         if (result == null) {
             res.send('Wrong login');
@@ -100,7 +100,7 @@ app.post('/registration', function(req, res) {
     const users = req.app.locals.users;
     users.findOne({login: req.body.login}, function(err, result) {
         if (err) { 
-             return(console.log(err));
+             return (console.log(err));
         } if (result != null) {
             res.send('Try another login');
             return;
@@ -112,8 +112,8 @@ app.post('/registration', function(req, res) {
                 if (err) { 
                     return(console.log(err));
                } if (result != null) {
-                res.send('Try another name');
-                return;
+                    res.send('Try another name');
+                    return;
                } if (req.body.name.length < 4) {
                     res.send('Name is too short');
                     return;
@@ -122,7 +122,7 @@ app.post('/registration', function(req, res) {
                     return;
                } else {
                 users.insertOne({login: req.body.login, name: req.body.name, password: req.body.password}, function(err, result) {
-                    if (err) return(console.log(err));
+                    if (err) return (console.log(err));
                         res.append('X-Redirect', 'authorization.html');
                         res.send('');
                 });
@@ -132,17 +132,17 @@ app.post('/registration', function(req, res) {
     });
 });
 
-app.ws('/echo', function(websocket,req) {
+app.ws('/echo', function(websocket, req) {
     const session = req.cookies['session'] || false;
     const users = app.locals.users
     const messages = req.app.locals.messages;
     if (session) {
-        messages.find().sort({$natural: -1}).limit(10).toArray(function(err,result) {
-            var history = result.reverse();
-            websocket.send(JSON.stringify({type:'history', history: result}));
+        messages.find().sort({$natural: -1}).limit(10).toArray(function(err, result) {
+            let history = result.reverse();
+            websocket.send(JSON.stringify({type: 'history', history: result}));
             console.log(history);
         });
-        users.findOne({session: session}, function(err,result) {
+        users.findOne({session: session}, function(err, result) {
             if (result) {
                 websocket.send(JSON.stringify({name: result.name, type: 'userInfo'}));
                 console.log('A new client con!');
@@ -152,7 +152,7 @@ app.ws('/echo', function(websocket,req) {
                     msg = JSON.parse(msg);
                     let message = msg.data;
                     console.log(websocket.name + ': ' + message);
-                    connects.forEach(function e(client) {
+                    connects.forEach(function (client) {
                         if (client.readyState === websocket.OPEN) {
                             if (client != websocket) { 
                                 if (msg.type === 'message') {
@@ -166,7 +166,7 @@ app.ws('/echo', function(websocket,req) {
                     });
                     messages.insertOne({name: websocket.name, message: message}, function(err, result) {
                         if (err) {
-                            return(console.log(err));
+                            return (console.log(err));
                         }
                     });
     
@@ -193,4 +193,3 @@ app.get('/logout', function(req, res) {
 });
 
 app.listen(portNumber, () => {console.log('Server is running on port:3000')});
-

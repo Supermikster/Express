@@ -1,18 +1,18 @@
-var log = document.getElementById('log');
-var pass = document.getElementById('pass');
-var nam = document.getElementById('nam');
+let log = document.getElementById('log');
+let pass = document.getElementById('pass');
+let nam = document.getElementById('nam');
 document.getElementById('registration').addEventListener("click", function(e) {
 e.preventDefault();
     let autoriz = document.forms["loginform"];
     let login = document.getElementById('login');
     let name = document.getElementById('name')
     let password = document.getElementById('password');
-    let user = JSON.stringify({login: login.value, name: name.value ,password: password.value});
+    let user = JSON.stringify({login: login.value, name: name.value, password: password.value});
     let request = new XMLHttpRequest();
     request.open("POST","http://localhost:3000/registration", true);
     request.setRequestHeader("Content-Type", "application/json");
     request.addEventListener("load", function (e) {
-        var url = request && request.getResponseHeader('X-Redirect');
+        let url = request && request.getResponseHeader('X-Redirect');
             if (url) {
                 window.location.assign(url);
             } if (request.response === 'Password is too short') {
@@ -32,7 +32,7 @@ e.preventDefault();
                 return;
             }       
     });
-    request.send(JSON.stringify({login: login.value, name: name.value ,password: password.value}));
+    request.send(JSON.stringify({login: login.value, name: name.value, password: password.value}));
 });
 
 document.getElementById('signIn').addEventListener("click", function(e) {

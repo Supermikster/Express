@@ -1,4 +1,4 @@
-var log = document.getElementById('log');
+let log = document.getElementById('log');
 document.getElementById('signIn').addEventListener("click", function(e) {
     e.preventDefault();
     let autoriz = document.forms["loginform"];
@@ -9,7 +9,7 @@ document.getElementById('signIn').addEventListener("click", function(e) {
     request.open("POST","http://localhost:3000/authorization", true);
     request.setRequestHeader("Content-Type", "application/json");
     request.addEventListener("load", function (e) { 
-        var url = request && request.getResponseHeader('X-Redirect');
+        let url = request && request.getResponseHeader('X-Redirect');
         if (url) {
             window.location.assign(url);
         } else {
@@ -17,7 +17,6 @@ document.getElementById('signIn').addEventListener("click", function(e) {
             return;
         }
     });
-
     request.send(JSON.stringify({login: login.value, password: password.value}));
 });
 
