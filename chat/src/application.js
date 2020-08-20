@@ -19,7 +19,7 @@ function getCookie(name) {
 ws.onopen = function(event) {
     console.log('connected to the ws server');
         if (ws.onopen) { 
-            log.innerHTML += "You: have been connected to the chat!" + "<br>";
+            log.innerHTML += 'You: have been connected to the chat!' + '<br>';
         } 
     checkStatus();
 }
@@ -35,7 +35,7 @@ ws.onmessage = function(event) {
                 console.log(data.history);     
                 if (data.history && data.history.length  > 0) {
                     data.history.forEach(message => {
-                    log.innerHTML += message.name + ": " + message.message + "<br>";
+                    log.innerHTML += message.name + ': ' + message.message + '<br>';
                     });
                 }
                 break; 
@@ -43,7 +43,7 @@ ws.onmessage = function(event) {
                 console.log(data);
                 break;
             default:
-                log.innerHTML += data.name + ": " + data.message + "<br>";
+                log.innerHTML += data.name + ': ' + data.message + '<br>';
         }                              
 }
 
@@ -72,7 +72,7 @@ document.getElementById('sendMsg').addEventListener("click", function(e) {
         if (document.getElementById('text').value == '') { 
             alert('Enter your message');
         } else { 
-            log.innerHTML += "You: " + text + "<br>";
+            log.innerHTML += 'You: ' + text + '<br>';
             document.getElementById('text').value = '';
         }
     checkStatus();
@@ -89,7 +89,7 @@ function check (key) {
         if (document.getElementById('text').value == '') { 
             alert('Enter your message');
         } else { 
-            log.innerHTML += "You: " + text + "<br>";
+            log.innerHTML += 'You: ' + text + '<br>';
             document.getElementById('text').value = '';
         }
         checkStatus();
