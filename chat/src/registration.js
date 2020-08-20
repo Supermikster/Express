@@ -13,14 +13,14 @@ e.preventDefault();
     request.setRequestHeader("Content-Type", "application/json");
     request.addEventListener("load", function (e) {
         var url = request && request.getResponseHeader('X-Redirect');
-            if(url) {
+            if (url) {
                 window.location.assign(url);
-            } if(request.response === 'Password is too short') {
+            } if (request.response === 'Password is too short') {
                 pass.innerHTML = request.response;
                 log.innerHTML = '';
                 nam.innerHTML = '';
                 return;
-            } if(request.response === 'Name is too short') {
+            } if (request.response === 'Name is too short') {
                 nam.innerHTML = request.response;
                 pass.innerHTML = '';
                 log.innerHTML = '';

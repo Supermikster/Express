@@ -18,7 +18,7 @@ function getCookie(name) {
 
 ws.onopen = function(event) {
     console.log('connected to the ws server');
-        if(ws.onopen) { 
+        if (ws.onopen) { 
             log.innerHTML += "You: have been connected to the chat!" + "<br>";
         } 
     checkStatus();
@@ -33,7 +33,7 @@ ws.onmessage = function(event) {
                 break; 
             case 'history':
                 console.log(data.history);     
-                if(data.history && data.history.length  > 0) {
+                if (data.history && data.history.length  > 0) {
                     data.history.forEach(message => {
                     log.innerHTML += message.name + ": " + message.message + "<br>";
                     });
@@ -111,7 +111,7 @@ emoji_code = [
     127867,
 ]
 
-for(index = 0; index <= emoji_code.length -1; index++) {
+for (index = 0; index <= emoji_code.length -1; index++) {
     div.innerHTML += "<span class = 'my_emoji'>" + "&#" + emoji_code[index] + "</span>";
     emoji = "&#" + emoji_code[index];
     console.log(emoji);
@@ -119,7 +119,7 @@ for(index = 0; index <= emoji_code.length -1; index++) {
 
 my_emoji = document.querySelectorAll('.my_emoji');
 
-for(i = 0; i <= my_emoji.length -1; i++) {
+for (i = 0; i <= my_emoji.length -1; i++) {
     console.log(my_emoji[i]);
     my_emoji[i].addEventListener('click', (event) => {
         emoji_clicked = event.target.textContent;

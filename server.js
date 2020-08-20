@@ -35,29 +35,26 @@ var sha512 = function(password, salt) {
     };
 };
 
-
-
 mongo.connect('mongodb://localhost:27017/', {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
     const db = client.db('usersdb');
     const users = db.createCollection('users');
     const messages = db.createCollection('messages');
     app.locals.users = client.db('usersdb').collection('users');
     app.locals.messages = client.db('usersdb').collection('messages');
-    if(err) {
+    if (err) {
         console.log('Connection error: ', err);
         throw err;
     }
     console.log('Connected');
 });
 
-
 app.get('/', function(req, res) {
     console.log('Client has been connected to the server and waiting authorizzation');
     const session = req.cookies['session'] || false;
     const users = app.locals.users
-    if(session) {
+    if (session) {
         users.findOne({session: session}, function(err,result) {
-            if(result) {
+            if (result) {
                 res.sendFile('aplication.html', {root: __dirname + '/chat'});
             } else {
                 res.redirect('authorization.html');
@@ -74,10 +71,10 @@ app.post('/authorization', function(req, res) {
     var salt;
     var passwordData;
     users.findOne({login: req.body.login}, function(err, result) {
-        if(result == null) {
+        if (result == null) {
             res.send('Wrong login');
             return;
-        } else if(result.password === req.body.password) {
+        } else if (result.password === req.body.password) {
             function saltHashPassword(userpassword) {
                 salt = genRandomString(16); /** Gives us salt of length 16 */
                 passwordData = sha512(userpassword, salt);
@@ -102,25 +99,25 @@ app.post('/registration', function(req, res) {
     console.log(req.body);
     const users = req.app.locals.users;
     users.findOne({login: req.body.login}, function(err, result) {
-        if(err) { 
+        if (err) { 
              return(console.log(err));
-        } if(result != null) {
+        } if (result != null) {
             res.send('Try another login');
             return;
-        } if(req.body.login.length < 8) {
+        } if (req.body.login.length < 8) {
             res.send('Login is too short');
             return;
         } else {
             users.findOne({login: req.body.name}, function(err, result) {
-                if(err) { 
+                if (err) { 
                     return(console.log(err));
-               } if(result != null) {
+               } if (result != null) {
                 res.send('Try another name');
                 return;
-               } if(req.body.name.length < 4) {
+               } if (req.body.name.length < 4) {
                     res.send('Name is too short');
                     return;
-               } if(req.body.password.length < 10) {
+               } if (req.body.password.length < 10) {
                     res.send('Password is too short');
                     return;
                } else {
@@ -139,14 +136,14 @@ app.ws('/echo', function(websocket,req) {
     const session = req.cookies['session'] || false;
     const users = app.locals.users
     const messages = req.app.locals.messages;
-    if(session) {
+    if (session) {
         messages.find().sort({$natural: -1}).limit(10).toArray(function(err,result) {
             var history = result.reverse();
             websocket.send(JSON.stringify({type:'history', history: result}));
             console.log(history);
         });
         users.findOne({session: session}, function(err,result) {
-            if(result) {
+            if (result) {
                 websocket.send(JSON.stringify({name: result.name, type: 'userInfo'}));
                 console.log('A new client con!');
                 websocket.name = result.name;
@@ -156,9 +153,9 @@ app.ws('/echo', function(websocket,req) {
                     let message = msg.data;
                     console.log(websocket.name + ': ' + message);
                     connects.forEach(function e(client) {
-                        if(client.readyState === websocket.OPEN) {
-                            if(client != websocket) { 
-                                if(msg.type === 'message') {
+                        if (client.readyState === websocket.OPEN) {
+                            if (client != websocket) { 
+                                if (msg.type === 'message') {
                                 client.send(JSON.stringify({
                                     name: websocket.name,
                                     message: message,
@@ -168,7 +165,7 @@ app.ws('/echo', function(websocket,req) {
                         }
                     });
                     messages.insertOne({name: websocket.name, message: message}, function(err, result) {
-                        if(err) {
+                        if (err) {
                             return(console.log(err));
                         }
                     });

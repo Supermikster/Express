@@ -1,7 +1,5 @@
-
 body {
-    background-image: url(back.png);
-                
+    background-image: url(back.png);               
 }
 
 button.ghostbutton  {
@@ -19,28 +17,23 @@ button.ghostbutton  {
     text-decoration: none;
     letter-spacing: 1px;
     transition: all 0.3s ease-out;
-    display: inline-block;
-    
-  }
+    display: inline-block; 
+}
 
-  button.ghostbutton:hover{
+button.ghostbutton:hover {
     background: #FF6347;
-  }
+}
 
 div#log {
     width: 700px;
     height: 500px;
-    /* margin: 0 auto; */
     margin-left: 320px;
     border: 5px solid rgba(160, 167, 62, 0.5);
     border-radius: 7px;
     background-image: url(textura-papel-antigo.png);
-   /* display: inline-block;*/
     overflow-y: scroll;
     float: left;
 }
-
-
 
 div#sendCtrls {
     width: 180px;
@@ -68,7 +61,7 @@ button.knopka:hover {
 	background: #FF6347; 
 }
 
-input[id=text]{
+input [id=text] {
     width: 270px;
     padding: 10px;
     margin-left: 533px;

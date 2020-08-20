@@ -10,7 +10,7 @@ document.getElementById('signIn').addEventListener("click", function(e) {
     request.setRequestHeader("Content-Type", "application/json");
     request.addEventListener("load", function (e) { 
         var url = request && request.getResponseHeader('X-Redirect');
-        if(url) {
+        if (url) {
             window.location.assign(url);
         } else {
             log.innerHTML = request.response;
